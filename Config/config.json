@@ -1,0 +1,72 @@
+{
+  "version": 1,
+
+  "appearance": {
+    "theme": "WindowsXP",
+    "fontFamily": "Consolas",
+    "fontSize": 14,
+    "cursorStyle": "Block",
+    "cursorBlink": true,
+    "padding": 8,
+    "windowOpacity": 1.0
+  },
+
+  "window": {
+    "showTitleBar": true,
+    "showNavbar": true,
+    "startMaximized": false,
+    "rememberWindowBounds": true
+  },
+
+  "navbar": {
+    "visible": true,
+    "position": "Top",
+    "height": 48,
+    "background": "#D4D0C8",
+    "foreground": "#000000",
+    "showBrand": true,
+    "showButtonText": true,
+    "showButtonIcons": true,
+    "spacing": 8,
+    "padding": 8,
+    "items": [
+      {
+        "id": "split",
+        "type": "button",
+        "text": "Split",
+        "icon": "split.svg",
+        "visible": true,
+        "enabled": true
+      },
+      {
+        "id": "settings",
+        "type": "button",
+        "text": "Settings",
+        "icon": "settings.svg",
+        "visible": true,
+        "enabled": true
+      }
+    ]
+  },
+
+  "layout": {
+    "defaultSplit": "Vertical",
+    "panelSpacing": 4,
+    "showPanelBorders": true,
+    "showActivePanelBorder": true,
+    "activePanelBorderThickness": 2
+  },
+
+  "behavior": {
+    "confirmBeforeClosing": false,
+    "rememberWorkingDirectory": true,
+    "restorePreviousSession": false
+  },
+
+  "keybindings": {
+    "split": "Ctrl+T",
+    "closePanel": "Ctrl+W",
+    "nextPanel": "Ctrl+Tab",
+    "previousPanel": "Ctrl+Shift+Tab"
+  }
+}

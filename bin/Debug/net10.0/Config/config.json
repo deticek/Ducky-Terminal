@@ -1,0 +1,49 @@
+{
+  "Version": 1,
+  "Appearance": {
+    "Theme": "MyTheme",
+    "FontFamily": "Consolas",
+    "FontSize": 14,
+    "CursorStyle": "Block",
+    "CursorBlink": true,
+    "Padding": 8,
+    "WindowOpacity": 1
+  },
+  "Window": {
+    "ShowTitleBar": true,
+    "ShowNavbar": true,
+    "StartMaximized": false,
+    "RememberWindowBounds": true
+  },
+  "Navbar": {
+    "Visible": true,
+    "Position": "Top",
+    "Height": 48,
+    "Background": "#D4D0C8",
+    "Foreground": "#000000",
+    "ShowBrand": true,
+    "ShowButtonText": true,
+    "ShowButtonIcons": true,
+    "Spacing": 8,
+    "Padding": 8,
+    "Items": []
+  },
+  "Layout": {
+    "DefaultSplit": "Vertical",
+    "PanelSpacing": 4,
+    "ShowPanelBorders": true,
+    "ShowActivePanelBorder": true,
+    "ActivePanelBorderThickness": 2
+  },
+  "Behavior": {
+    "ConfirmBeforeClosing": false,
+    "RememberWorkingDirectory": true,
+    "RestorePreviousSession": false
+  },
+  "Keybindings": {
+    "Split": "Ctrl\u002BT",
+    "ClosePanel": "Ctrl\u002BW",
+    "NextPanel": "Ctrl\u002BTab",
+    "PreviousPanel": "Ctrl\u002BShift\u002BTab"
+  }
+}

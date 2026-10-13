@@ -1,0 +1,34 @@
+{
+  "name": "Windows XP Retro",
+  "author": "Dterminal",
+  "colors": {
+    "windowBackground": "#ECE9D8",
+    "panelBackground": "#000000",
+    "foreground": "#C0C0C0",
+    "cursor": "#FFFFFF",
+    "selectionBackground": "#000080",
+    "selectionForeground": "#FFFFFF",
+    "panelBorder": "#7F9DB9",
+    "toolbarBackground": "#D4D0C8",
+    "toolbarForeground": "#000000",
+    "accent": "#316AC5"
+  },
+  "terminal": {
+    "black": "#000000",
+    "red": "#800000",
+    "green": "#008000",
+    "yellow": "#808000",
+    "blue": "#000080",
+    "magenta": "#800080",
+    "cyan": "#008080",
+    "white": "#C0C0C0",
+    "brightBlack": "#808080",
+    "brightRed": "#FF0000",
+    "brightGreen": "#00FF00",
+    "brightYellow": "#FFFF00",
+    "brightBlue": "#0000FF",
+    "brightMagenta": "#FF00FF",
+    "brightCyan": "#00FFFF",
+    "brightWhite": "#FFFFFF"
+  }
+}
