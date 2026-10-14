@@ -50,11 +50,23 @@ public sealed class ThemeColors
 public static class ThemeService
 {
 
+    public static string ThemesDirectory
+{
+    get
+    {
+        string projectThemes = Path.Combine(
+            Environment.CurrentDirectory,
+            "Themes");
+
+        return Directory.Exists(projectThemes)
+            ? projectThemes
+            : Path.Combine(AppContext.BaseDirectory, "Themes");
+    }
+}
+
 public static string[] GetAvailableThemeNames()
 {
-    string themesDirectory = Path.Combine(
-        AppContext.BaseDirectory,
-        "Themes");
+    string themesDirectory = ThemesDirectory;
 
     if (!Directory.Exists(themesDirectory))
         return Array.Empty<string>();
@@ -68,9 +80,9 @@ public static string[] GetAvailableThemeNames()
     public static ThemeFile Load(string themeName)
     {
         string path = Path.Combine(
-            AppContext.BaseDirectory,
-            "Themes",
-            $"{themeName}.json");
+        ThemesDirectory,
+        $"{themeName}.json");
+
 
         try
         {

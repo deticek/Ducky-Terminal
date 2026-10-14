@@ -1,9 +1,12 @@
 {
   "Version": 1,
+  "Shell": {
+    "Selected": "Command Prompt"
+  },
   "Appearance": {
     "Theme": "MyTheme",
-    "FontFamily": "Consolas",
-    "FontSize": 14,
+    "FontFamily": "Courier New",
+    "FontSize": 15,
     "CursorStyle": "Block",
     "CursorBlink": true,
     "Padding": 8,

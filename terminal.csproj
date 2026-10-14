@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,10 +19,11 @@
     <PackageReference Include="Exclr8.Terminal" Version="1.0.9" />
     <PackageReference Include="Exclr8.Terminal.Pty" Version="1.0.4" />
   </ItemGroup>
-<ItemGroup> 
-<None Update="Config\config.json" CopyToOutputDirectory="PreserveNewest" />
+  <ItemGroup> 
+  <None Update="Config\config.json" CopyToOutputDirectory="PreserveNewest" />
 
-<None Update="Themes\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  <None Update="Themes\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 
-</ItemGroup>
+  <AvaloniaResource Include="Assets\logo.ico" />
+  </ItemGroup>
 </Project>

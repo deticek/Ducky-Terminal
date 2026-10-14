@@ -9,7 +9,7 @@ public sealed class AppConfig
 {
 public int Version { get; set; } = 1;
 
-
+public ShellSelectionConfig Shell { get; set; } = new();
 public AppearanceConfig Appearance { get; set; } = new();
 public WindowConfig Window { get; set; } = new();
 public NavbarConfig Navbar { get; set; } = new();
@@ -93,6 +93,10 @@ public string NextPanel { get; set; } = "Ctrl+Tab";
 public string PreviousPanel { get; set; } = "Ctrl+Shift+Tab";
 }
 
+public sealed class ShellSelectionConfig
+{
+    public string Selected { get; set; } = "Command Prompt";
+}
 public static class ConfigService
 {
 private static readonly JsonSerializerOptions JsonOptions = new()
@@ -144,6 +148,5 @@ public static void Save(AppConfig config)
 
     File.WriteAllText(ConfigPath, json);
 }
-
 
 }
