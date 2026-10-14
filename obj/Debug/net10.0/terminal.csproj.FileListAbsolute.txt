@@ -109,4 +109,6 @@ C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\MyTheme.json
 C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\WindowsXP.json
 C:\Users\deticek\project\terminal\terminal\obj\Debug\net10.0\terminal.sourcelink.json
 C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\MarbleDark.json
-C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\Soviet.json
+C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\Random.json
+C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\Ducky.json
+C:\Users\deticek\project\terminal\terminal\bin\Debug\net10.0\Themes\NkMaribor.json

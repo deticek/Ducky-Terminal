@@ -1,72 +1,69 @@
 {
-  "version": 1,
-
-  "appearance": {
-    "theme": "WindowsXP",
-    "fontFamily": "Consolas",
-    "fontSize": 14,
-    "cursorStyle": "Block",
-    "cursorBlink": true,
-    "padding": 8,
-    "windowOpacity": 1.0
+  "Version": 1,
+  "Shell": {
+    "Selected": "Command Prompt"
   },
-
-  "window": {
-    "showTitleBar": true,
-    "showNavbar": true,
-    "startMaximized": false,
-    "rememberWindowBounds": true
+  "Appearance": {
+    "Theme": "MyTheme",
+    "FontFamily": "Consolas",
+    "FontSize": 14,
+    "CursorStyle": "Block",
+    "CursorBlink": true,
+    "Padding": 8,
+    "WindowOpacity": 1
   },
-
-  "navbar": {
-    "visible": true,
-    "position": "Top",
-    "height": 48,
-    "background": "#D4D0C8",
-    "foreground": "#000000",
-    "showBrand": true,
-    "showButtonText": true,
-    "showButtonIcons": true,
-    "spacing": 8,
-    "padding": 8,
-    "items": [
+  "Window": {
+    "ShowTitleBar": true,
+    "ShowNavbar": true,
+    "StartMaximized": false,
+    "RememberWindowBounds": true
+  },
+  "Navbar": {
+    "Visible": true,
+    "Position": "Top",
+    "Height": 48,
+    "Background": "#D4D0C8",
+    "Foreground": "#000000",
+    "ShowBrand": true,
+    "ShowButtonText": true,
+    "ShowButtonIcons": true,
+    "Spacing": 8,
+    "Padding": 8,
+    "Items": [
       {
-        "id": "split",
-        "type": "button",
-        "text": "Split",
-        "icon": "split.svg",
-        "visible": true,
-        "enabled": true
+        "Id": "split",
+        "Type": "button",
+        "Text": "Split",
+        "Icon": "split.svg",
+        "Visible": true,
+        "Enabled": true
       },
       {
-        "id": "settings",
-        "type": "button",
-        "text": "Settings",
-        "icon": "settings.svg",
-        "visible": true,
-        "enabled": true
+        "Id": "settings",
+        "Type": "button",
+        "Text": "Settings",
+        "Icon": "settings.svg",
+        "Visible": true,
+        "Enabled": true
       }
     ]
   },
-
-  "layout": {
-    "defaultSplit": "Vertical",
-    "panelSpacing": 4,
-    "showPanelBorders": true,
-    "showActivePanelBorder": true,
-    "activePanelBorderThickness": 2
+  "Layout": {
+    "DefaultSplit": "Vertical",
+    "PanelSpacing": 4,
+    "ShowPanelBorders": true,
+    "ShowActivePanelBorder": true,
+    "ActivePanelBorderThickness": 2
   },
-
-  "behavior": {
-    "confirmBeforeClosing": false,
-    "rememberWorkingDirectory": true,
-    "restorePreviousSession": false
+  "Behavior": {
+    "ConfirmBeforeClosing": false,
+    "RememberWorkingDirectory": true,
+    "RestorePreviousSession": false
   },
-
-  "keybindings": {
-    "split": "Ctrl+T",
-    "closePanel": "Ctrl+W",
-    "nextPanel": "Ctrl+Tab",
-    "previousPanel": "Ctrl+Shift+Tab"
+  "Keybindings": {
+    "Split": "Ctrl\u002BT",
+    "ClosePanel": "Ctrl\u002BW",
+    "NextPanel": "Ctrl\u002BTab",
+    "PreviousPanel": "Ctrl\u002BShift\u002BTab"
   }
 }

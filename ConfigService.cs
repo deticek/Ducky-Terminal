@@ -109,7 +109,7 @@ WriteIndented = true
 
 
 public static string ConfigDirectory =>
-    Path.Combine(AppContext.BaseDirectory, "Config");
+    Path.Combine(Environment.CurrentDirectory, "Config");
 
 public static string ConfigPath =>
     Path.Combine(ConfigDirectory, "config.json");

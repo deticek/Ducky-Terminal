@@ -25,10 +25,12 @@ public partial class MainWindow : Window
         public TerminalControl Terminal { get; }
         public PtyTerminalAdapter Adapter { get; }
         public bool ShellStarted { get; set; }
+        public string CurrentDirectory { get; set; }
 
-        public TerminalPane(TerminalControl terminal, PtyTerminalAdapter adapter){
+        public TerminalPane(TerminalControl terminal, PtyTerminalAdapter adapter, string currentDirectory){
             Terminal = terminal;
             Adapter = adapter;
+            CurrentDirectory = currentDirectory;
         }
     }
 
@@ -38,6 +40,7 @@ public partial class MainWindow : Window
     private readonly List<TerminalPane> _panes = new();
 
     private int _activePaneIndex = 0;
+    private const int MaxPanes = 4;
     private bool _closing;
     private bool _shellRestarting;
     private readonly AppConfig _config;
@@ -390,7 +393,7 @@ private void QueueThemeReload()
         {
             await oldPane.Adapter.DisposeAsync();
 
-            TerminalPane newPane = AddPane();
+           TerminalPane newPane = AddPane(oldPane.CurrentDirectory);
 
             _panes.Remove(newPane);
             _panes.Insert(index, newPane);
@@ -413,8 +416,17 @@ private void QueueThemeReload()
 
     // Ustvari nov terminalski panel.*/
   
-    private TerminalPane AddPane()
+    private TerminalPane AddPane(string? startDirectory = null)
     {
+
+        string home = Environment.GetFolderPath(
+        Environment.SpecialFolder.UserProfile);
+
+        string workingDirectory = !string.IsNullOrWhiteSpace(startDirectory)
+        && Directory.Exists(startDirectory)
+            ? startDirectory
+            : home;
+
         var terminal = new TerminalControl
         {
             FontFamily = _config.Appearance.FontFamily,
@@ -426,7 +438,7 @@ private void QueueThemeReload()
         var selectedShell = _shellChoices.First(choice => choice.Name == _config.Shell.Selected);
         var adapter = new PtyTerminalAdapter(terminal);
 
-        var pane = new TerminalPane(terminal, adapter);
+        var pane = new TerminalPane(terminal, adapter, workingDirectory);
 
         _panes.Add(pane);
 
@@ -506,7 +518,7 @@ private void QueueThemeReload()
                     Name = "xterm-256color",
                     App = selectedShell.App,
                     CommandLine = selectedShell.Arguments,
-                    Cwd = home,
+                    Cwd = pane.CurrentDirectory,
                     Cols = size.Cols,
                     Rows = size.Rows,
 
@@ -532,15 +544,30 @@ private void QueueThemeReload()
 
     // Ustvari nov panel in posodobi postavitev.
     private void SplitTerminal()
-    {
-        var pane = AddPane();
+{
+    if (_panes.Count >= MaxPanes)
+        return;
 
-        _activePaneIndex = _panes.Count - 1;
+    string currentDirectory = GetCurrentPanelPath();
 
-        RebuildLayout();
+    var pane = AddPane(currentDirectory);
 
-        pane.Terminal.Focus();
-    }
+    _activePaneIndex = _panes.IndexOf(pane);
+
+    RebuildLayout();
+
+    pane.Terminal.Focus();
+}
+
+private string GetCurrentPanelPath()
+{
+    if (_panes.Count == 0)
+        return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    int index = Math.Clamp(_activePaneIndex, 0, _panes.Count - 1);
+
+    return _panes[index].CurrentDirectory;
+}
 
     // Ponovno sestavi mrežo panelov.
     private void RebuildLayout()
@@ -664,6 +691,15 @@ private void QueueThemeReload()
             return;
         }
 
+        bool altGrOrCtrlAlt =
+        e.KeyModifiers.HasFlag(KeyModifiers.Control) &&
+        e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+
+        if (OperatingSystem.IsWindows() && altGrOrCtrlAlt)
+        {
+        return;
+        }
+
         if (e.KeyModifiers.HasFlag(KeyModifiers.Alt)){
             
             if (e.Key == Key.F4)
@@ -781,48 +817,80 @@ private void QueueThemeReload()
     }
 
     private void ShowShortcutsHelp()
+{
+    var helpWindow = new Window
     {
-        var helpWindow = new Window
+        Title = "Keyboard shortcuts",
+        SizeToContent = SizeToContent.Height,
+        Width = 460,
+        MinWidth = 460,
+        MinHeight = 200,
+        MaxHeight = 450,
+        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        Background = this.Background,
+        Foreground = this.Foreground,
+        CanResize = false,
+        Content = new StackPanel
         {
-            Title = "Keyboard shortcuts",
-            Width = 430,
-            Height = 360,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            Content = new TextBlock
+            Margin = new Thickness(20,20,20,10),
+            Spacing = 8,
+            Children =
             {
-                Margin = new Thickness(20),
-                TextWrapping = TextWrapping.Wrap,
-                Text =
-                    "Alt+T              Open theme list\n" +
-                    "Alt+S              Open shell list\n" +
-                    "Alt+F              Open font list\n" +
-                    "F1                 Show this help\n" +
-                    "Ctrl+T             Split pane\n" +
-                    "Ctrl+W             Close active pane\n" +
-                    "Ctrl+Tab           Next pane\n" +
-                    "Ctrl+Shift+Tab     Previous pane\n" +
-                    "Ctrl++             Increase font size\n" +
-                    "Ctrl+-             Decrease font size\n" +
-                    "Alt+F4             Exit"
-            }
-        };
+                new TextBlock
+                {
+                    Text = "KEYBOARD SHORTCUTS",
+                    FontSize = 20,
+                    FontWeight = FontWeight.Bold,
+                    Foreground = this.Foreground,
+                    Margin = new Thickness(0, 0, 0, 8)
+                },
 
-        helpWindow.AddHandler(
-        InputElement.KeyDownEvent,
-        (_, e) =>
+                new TextBlock
+                {
+                    Text =
+                        "Alt + T                    Open theme list\n" +
+                        "Alt + S                    Open shell list\n" +
+                        "Alt + F                    Open font list\n" +
+                        "F1                         Show this help\n" +
+                        "Ctrl + T                   Split pane\n" +
+                        "Ctrl + W                   Close active pane\n" +
+                        "Ctrl + Tab                 Next pane\n" +
+                        "Ctrl + Shift + Tab         Previous pane\n" +
+                        "Ctrl + +                   Increase font size\n" +
+                        "Ctrl + -                   Decrease font size\n" +
+                        "Alt + F4                   Exit",
+                    FontFamily = new FontFamily("Consolas"),
+                    FontSize = 14,
+                    Foreground = this.Foreground
+                },
+
+                new Button
+                {
+                    Content = "Close",
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                    Padding = new Thickness(20, 8),
+                }
+            }
+        }
+    };
+
+    helpWindow.KeyDown += (_, e) =>
+    {
+        if (e.Key == Key.Escape || e.Key == Key.F1 ||
+            (e.Key == Key.W && e.KeyModifiers.HasFlag(KeyModifiers.Control)))
         {
-            bool closeHelp = e.Key == Key.Escape || e.Key == Key.F1 ||
-            (e.Key == Key.W && e.KeyModifiers.HasFlag(KeyModifiers.Control));
+            helpWindow.Close();
+            e.Handled = true;
+        }
+    };
 
-            if (closeHelp)
-            {
-                helpWindow.Close();
-                e.Handled = true;
-            }
-        },
-        RoutingStrategies.Tunnel);
-
-        helpWindow.ShowDialog(this);
+    if (helpWindow.Content is StackPanel panel &&
+        panel.Children[2] is Button closeButton)
+    {
+        closeButton.Click += (_, _) => helpWindow.Close();
     }
+
+    helpWindow.ShowDialog(this);
+}
 
 }

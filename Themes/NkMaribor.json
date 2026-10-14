@@ -1,0 +1,34 @@
+{
+  "name": "NkMaribor",
+  "author": "deticek",
+  "colors": {
+    "windowBackground": "#101014",
+    "panelBackground": "#191922",
+    "foreground": "#FFFDE7",
+    "cursor": "#FFFF00",
+    "selectionBackground": "#5B3EFF",
+    "selectionForeground": "#FFFFFF",
+    "panelBorder": "#713DFF",
+    "toolbarBackground": "#222233",
+    "toolbarForeground": "#FFFF00",
+    "accent": "#FFFF00"
+  },
+  "terminal": {
+    "black": "#101014",
+    "red": "#FF3864",
+    "green": "#39FF14",
+    "yellow": "#FFFF00",
+    "blue": "#00BFFF",
+    "magenta": "#FF00FF",
+    "cyan": "#00FFFF",
+    "white": "#FFFDE7",
+    "brightBlack": "#777788",
+    "brightRed": "#FF1744",
+    "brightGreen": "#76FF03",
+    "brightYellow": "#FFE600",
+    "brightBlue": "#448AFF",
+    "brightMagenta": "#FF4DFF",
+    "brightCyan": "#18FFFF",
+    "brightWhite": "#FFFFFF"
+  }
+}

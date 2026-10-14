@@ -1,0 +1,34 @@
+{
+  "name": "Ducky - Sunny Side Up",
+  "author": "deticek",
+  "colors": {
+    "windowBackground": "#FFF000",
+    "panelBackground": "#FFE500",
+    "foreground": "#302000",
+    "cursor": "#FF6D00",
+    "selectionBackground": "#FF9F00",
+    "selectionForeground": "#302000",
+    "panelBorder": "#FF6D00",
+    "toolbarBackground": "#FFE500",
+    "toolbarForeground": "#302000",
+    "accent": "#FF6D00"
+  },
+  "terminal": {
+    "black": "#302000",
+    "red": "#FF3D00",
+    "green": "#398A00",
+    "yellow": "#FFD600",
+    "blue": "#0077CC",
+    "magenta": "#C2185B",
+    "cyan": "#008C95",
+    "white": "#FFF9C4",
+    "brightBlack": "#795548",
+    "brightRed": "#FF5722",
+    "brightGreen": "#64DD17",
+    "brightYellow": "#FFFF00",
+    "brightBlue": "#40C4FF",
+    "brightMagenta": "#F50057",
+    "brightCyan": "#00E5FF",
+    "brightWhite": "#FFFFFF"
+  }
+}

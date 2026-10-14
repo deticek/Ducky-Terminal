@@ -4,9 +4,9 @@
     "Selected": "Command Prompt"
   },
   "Appearance": {
-    "Theme": "MyTheme",
-    "FontFamily": "Courier New",
-    "FontSize": 15,
+    "Theme": "Random",
+    "FontFamily": "Consolas",
+    "FontSize": 14,
     "CursorStyle": "Block",
     "CursorBlink": true,
     "Padding": 8,
@@ -29,7 +29,24 @@
     "ShowButtonIcons": true,
     "Spacing": 8,
     "Padding": 8,
-    "Items": []
+    "Items": [
+      {
+        "Id": "split",
+        "Type": "button",
+        "Text": "Split",
+        "Icon": "split.svg",
+        "Visible": true,
+        "Enabled": true
+      },
+      {
+        "Id": "settings",
+        "Type": "button",
+        "Text": "Settings",
+        "Icon": "settings.svg",
+        "Visible": true,
+        "Enabled": true
+      }
+    ]
   },
   "Layout": {
     "DefaultSplit": "Vertical",
