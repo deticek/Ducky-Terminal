@@ -16,7 +16,8 @@ public NavbarConfig Navbar { get; set; } = new();
 public LayoutConfig Layout { get; set; } = new();
 public BehaviorConfig Behavior { get; set; } = new();
 public KeybindingsConfig Keybindings { get; set; } = new();
-
+public WorkspaceConfig Workspace { get; set; } = new();
+public int ActiveWorkspace { get; set; } = 0;
 
 }
 
@@ -97,6 +98,73 @@ public sealed class ShellSelectionConfig
 {
     public string Selected { get; set; } = "Command Prompt";
 }
+
+public sealed class WorkspaceConfig
+{
+    public WorkspaceSpaceConfig Space0 { get; set; } = new();
+    public WorkspaceSpaceConfig Space1 { get; set; } = new();
+    public WorkspaceSpaceConfig Space2 { get; set; } = new();
+    public WorkspaceSpaceConfig Space3 { get; set; } = new();
+    public WorkspaceSpaceConfig Space4 { get; set; } = new();
+    public WorkspaceSpaceConfig Space5 { get; set; } = new();
+    public WorkspaceSpaceConfig Space6 { get; set; } = new();
+    public WorkspaceSpaceConfig Space7 { get; set; } = new();
+    public WorkspaceSpaceConfig Space8 { get; set; } = new();
+    public WorkspaceSpaceConfig Space9 { get; set; } = new();
+
+    public WorkspaceSpaceConfig GetSpace(int index)
+    {
+        return index switch
+        {
+            0 => Space0,
+            1 => Space1,
+            2 => Space2,
+            3 => Space3,
+            4 => Space4,
+            5 => Space5,
+            6 => Space6,
+            7 => Space7,
+            8 => Space8,
+            9 => Space9,
+            _ => throw new ArgumentOutOfRangeException(nameof(index))
+        };
+    }
+}
+
+public sealed class WorkspaceSpaceConfig
+{
+    public string Panel1 { get; set; } = "";
+    public string Panel2 { get; set; } = "";
+    public string Panel3 { get; set; } = "";
+    public string Panel4 { get; set; } = "";
+    public string Shell { get; set; } = "";
+
+    public string GetPanel(int index)
+    {
+        return index switch
+        {
+            0 => Panel1,
+            1 => Panel2,
+            2 => Panel3,
+            3 => Panel4,
+            _ => throw new ArgumentOutOfRangeException(nameof(index))
+        };
+    }
+
+    public void SetPanel(int index, string path)
+    {
+        switch (index)
+        {
+            case 0: Panel1 = path; break;
+            case 1: Panel2 = path; break;
+            case 2: Panel3 = path; break;
+            case 3: Panel4 = path; break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(index));
+        }
+    }
+}
+
 public static class ConfigService
 {
 private static readonly JsonSerializerOptions JsonOptions = new()

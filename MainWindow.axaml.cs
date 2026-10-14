@@ -26,21 +26,36 @@ public partial class MainWindow : Window
         public PtyTerminalAdapter Adapter { get; }
         public bool ShellStarted { get; set; }
         public string CurrentDirectory { get; set; }
+        public string ShellName { get; }
 
-        public TerminalPane(TerminalControl terminal, PtyTerminalAdapter adapter, string currentDirectory){
+        public TerminalPane(
+            TerminalControl terminal,
+            PtyTerminalAdapter adapter,
+            string currentDirectory,
+            string shellName){
             Terminal = terminal;
             Adapter = adapter;
             CurrentDirectory = currentDirectory;
+            ShellName = shellName;
         }
     }
 
     private FileSystemWatcher? _themeWatcher;
     private Avalonia.Threading.DispatcherTimer? _themeReloadTimer;
 
-    private readonly List<TerminalPane> _panes = new();
+private readonly List<TerminalPane>[] _workspacePanes =
+    Enumerable.Range(0, 10)
+        .Select(_ => new List<TerminalPane>())
+        .ToArray();
 
-    private int _activePaneIndex = 0;
-    private const int MaxPanes = 4;
+private List<TerminalPane> _panes = new();
+
+private int _activePaneIndex = 0;
+private int _activeWorkspaceIndex = 0;
+
+private const int MaxPanes = 4;
+private const int MaxWorkspaces = 10;
+
     private bool _closing;
     private bool _shellRestarting;
     private readonly AppConfig _config;
@@ -51,6 +66,12 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _config = ConfigService.Load();
+
+        _activeWorkspaceIndex = Math.Clamp(
+    _config.ActiveWorkspace, 0, MaxWorkspaces - 1);
+
+    _panes = _workspacePanes[_activeWorkspaceIndex];
+
         _theme = ThemeService.Load(_config.Appearance.Theme);
 
         ApplyTheme();
@@ -64,6 +85,10 @@ public partial class MainWindow : Window
         {
             _config.Shell.Selected = _shellChoices[0].Name;
         }
+
+        var activeWorkspaceConfig = _config.Workspace.GetSpace(_activeWorkspaceIndex);
+        _config.Shell.Selected = GetWorkspaceShell(_activeWorkspaceIndex);
+        activeWorkspaceConfig.Shell = _config.Shell.Selected;
 
         ShellSelector.SelectedItem = _config.Shell.Selected;
 
@@ -97,8 +122,12 @@ public partial class MainWindow : Window
         FontSelector.ItemsSource = fontChoices;
         FontSelector.SelectedItem = _config.Appearance.FontFamily;
 
-        AddPane();
+        //AddPane();
+
+        LoadWorkspacePanes(_activeWorkspaceIndex);
         RebuildLayout();
+
+        Title=$"Ducky - Workspace{_activeWorkspaceIndex}";
 
         // Sprejemaj bližnjice še pred obdelavo dogodkov terminala.
         AddHandler(InputElement.KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
@@ -110,6 +139,188 @@ public partial class MainWindow : Window
                 _panes[_activePaneIndex].Terminal.Focus();
         };
     }
+
+    private string GetDefaultDirectory()
+{
+    return Environment.GetFolderPath(
+        Environment.SpecialFolder.UserProfile);
+}
+
+private void UpdatePaneDirectory(TerminalPane pane, string directory)
+{
+    if (string.IsNullOrWhiteSpace(directory))
+        return;
+
+    if (!Directory.Exists(directory))
+        return;
+
+    pane.CurrentDirectory = directory;
+
+    int workspaceIndex = Array.FindIndex(
+        _workspacePanes,
+        workspace => workspace.Contains(pane));
+
+    if (workspaceIndex >= 0)
+        SaveWorkspacePaths(workspaceIndex);
+}
+
+private static string NormalizeWorkingDirectory(string workingDirectory)
+{
+    // OSC 7 may arrive either as a file URI or as the decoded path,
+    // depending on which terminal layer raised the event.
+    if (Uri.TryCreate(workingDirectory, UriKind.Absolute, out var uri) &&
+        uri.IsFile)
+    {
+        workingDirectory = uri.LocalPath;
+    }
+    else if (workingDirectory.StartsWith("file:///", StringComparison.OrdinalIgnoreCase))
+    {
+        workingDirectory = Uri.UnescapeDataString(
+            workingDirectory.Substring("file:///".Length));
+    }
+
+    // Windows file URIs can be surfaced as /C:/folder by OSC parsers.
+    if (workingDirectory.Length >= 3 &&
+        workingDirectory[0] == '/' &&
+        char.IsLetter(workingDirectory[1]) &&
+        workingDirectory[2] == ':')
+    {
+        workingDirectory = workingDirectory.Substring(1);
+    }
+
+    return workingDirectory.Replace('/', '\\');
+}
+
+private void SaveWorkspacePaths(int workspaceIndex)
+{
+    var panes = _workspacePanes[workspaceIndex];
+
+    // An empty in-memory list means this workspace has not been loaded.
+    // Preserve its saved paths instead of replacing them with blank values.
+    if (panes.Count == 0)
+        return;
+
+    var workspace = _config.Workspace.GetSpace(workspaceIndex);
+
+    for (int i = 0; i < MaxPanes; i++)
+    {
+        string path = "";
+
+        if (i < panes.Count)
+        {
+            path = panes[i].CurrentDirectory;
+
+            if (string.IsNullOrWhiteSpace(path) ||
+                !Directory.Exists(path))
+            {
+                path = GetDefaultDirectory();
+            }
+        }
+
+        workspace.SetPanel(i, path);
+    }
+
+    _config.ActiveWorkspace = _activeWorkspaceIndex;
+    ConfigService.Save(_config);
+}
+
+private void LoadWorkspacePanes(int workspaceIndex)
+{
+    _panes = _workspacePanes[workspaceIndex];
+
+    if (_panes.Count > 0)
+        return;
+
+    var workspace = _config.Workspace.GetSpace(workspaceIndex);
+
+    int lastSavedPanel = -1;
+
+    for (int i = 0; i < MaxPanes; i++)
+    {
+        string path = workspace.GetPanel(i);
+
+        if (!string.IsNullOrWhiteSpace(path))
+            lastSavedPanel = i;
+    }
+
+    // Če workspace še nima shranjenih poti,
+    // ustvarimo en panel v privzeti uporabniški mapi.
+    if (lastSavedPanel == -1)
+    {
+        AddPane(GetDefaultDirectory());
+        SaveWorkspacePaths(workspaceIndex);
+        return;
+    }
+
+    // Obnovimo shranjene panele.
+    // Prazne ali neobstoječe poti uporabijo privzeto mapo.
+    for (int i = 0; i <= lastSavedPanel; i++)
+    {
+        string path = workspace.GetPanel(i);
+
+        if (string.IsNullOrWhiteSpace(path) ||
+            !Directory.Exists(path))
+        {
+            path = GetDefaultDirectory();
+        }
+
+        AddPane(path);
+    }
+
+    SaveWorkspacePaths(workspaceIndex);
+}
+
+private void SwitchWorkspace(int workspaceIndex)
+{
+    if (workspaceIndex < 0 || workspaceIndex >= MaxWorkspaces)
+        return;
+
+    if (workspaceIndex == _activeWorkspaceIndex)
+        return;
+
+    // Shranimo trenutni workspace.
+    SaveWorkspacePaths(_activeWorkspaceIndex);
+
+    // Zamenjamo aktivni workspace.
+    _activeWorkspaceIndex = workspaceIndex;
+    _config.ActiveWorkspace = workspaceIndex;
+
+    var workspaceConfig = _config.Workspace.GetSpace(workspaceIndex);
+    _config.Shell.Selected = GetWorkspaceShell(workspaceIndex);
+    workspaceConfig.Shell = _config.Shell.Selected;
+    ShellSelector.SelectedItem = _config.Shell.Selected;
+
+    _panes = _workspacePanes[workspaceIndex];
+
+    // Če še nima aktivnih terminalov, jih obnovimo iz konfiguracije.
+    if (_panes.Count == 0)
+        LoadWorkspacePanes(workspaceIndex);
+
+    _activePaneIndex = Math.Clamp(
+        _activePaneIndex, 0, Math.Max(0, _panes.Count - 1));
+
+    Title = $"Ducky - Workspace {_activeWorkspaceIndex}";
+
+    ConfigService.Save(_config);
+
+    RebuildLayout();
+
+    if (_panes.Count > 0)
+        _panes[_activePaneIndex].Terminal.Focus();
+}
+
+private string GetWorkspaceShell(int workspaceIndex)
+{
+    string savedShell = _config.Workspace.GetSpace(workspaceIndex).Shell;
+
+    if (_shellChoices.Any(choice => choice.Name == savedShell))
+        return savedShell;
+
+    if (_shellChoices.Any(choice => choice.Name == _config.Shell.Selected))
+        return _config.Shell.Selected;
+
+    return _shellChoices[0].Name;
+}
 
     private void StartThemeWatcher()
 {
@@ -370,6 +581,7 @@ private void QueueThemeReload()
         }
 
         _config.Shell.Selected = name;
+        _config.Workspace.GetSpace(_activeWorkspaceIndex).Shell = name;
         ConfigService.Save(_config);
 
         await RestartActivePaneShellAsync();
@@ -438,7 +650,26 @@ private void QueueThemeReload()
         var selectedShell = _shellChoices.First(choice => choice.Name == _config.Shell.Selected);
         var adapter = new PtyTerminalAdapter(terminal);
 
-        var pane = new TerminalPane(terminal, adapter, workingDirectory);
+        var pane = new TerminalPane(
+            terminal,
+            adapter,
+            workingDirectory,
+            selectedShell.Name);
+
+    terminal.WorkingDirectoryChanged += (_, _) =>
+{
+    var directory = terminal.WorkingDirectory;
+
+    if (string.IsNullOrWhiteSpace(directory))
+        return;
+
+    directory = NormalizeWorkingDirectory(directory);
+
+    if (!Directory.Exists(directory))
+        return;
+
+    UpdatePaneDirectory(pane, directory);
+};
 
         _panes.Add(pane);
 
@@ -513,6 +744,19 @@ private void QueueThemeReload()
                     shell = "/bin/bash";
                 }
 
+                var shellEnvironment = new Dictionary<string, string>
+                {
+                    ["TERM"] = "xterm-256color",
+                    ["COLORTERM"] = "truecolor"
+                };
+
+                if (selectedShell.Name == "Command Prompt")
+                {
+                    // CMD reads PROMPT from its environment at startup. This
+                    // emits OSC 7 before each visible, otherwise standard prompt.
+                    shellEnvironment["PROMPT"] = @"$E]7;file:///$P$E\$P$G";
+                }
+
                 await adapter.StartAsync(new PtyOptions
                 {
                     Name = "xterm-256color",
@@ -521,12 +765,7 @@ private void QueueThemeReload()
                     Cwd = pane.CurrentDirectory,
                     Cols = size.Cols,
                     Rows = size.Rows,
-
-                    Environment = new Dictionary<string, string>
-                    {
-                        ["TERM"] = "xterm-256color",
-                        ["COLORTERM"] = "truecolor"
-                    }
+                    Environment = shellEnvironment
                 });
             }
             catch (Exception ex)
@@ -555,6 +794,8 @@ private void QueueThemeReload()
     _activePaneIndex = _panes.IndexOf(pane);
 
     RebuildLayout();
+
+    SaveWorkspacePaths(_activeWorkspaceIndex);
 
     pane.Terminal.Focus();
 }
@@ -631,10 +872,11 @@ private string GetCurrentPanelPath()
 
         _panes.RemoveAt(index);
 
-        await pane.Adapter.DisposeAsync();
+        _activePaneIndex = Math.Min(index, _panes.Count -1);
 
-        _activePaneIndex = Math.Min(
-            index, _panes.Count - 1);
+        SaveWorkspacePaths(_activeWorkspaceIndex);
+
+        await pane.Adapter.DisposeAsync();
 
         RebuildLayout();
 
@@ -673,6 +915,26 @@ private string GetCurrentPanelPath()
         FontSelector.IsDropDownOpen = false;
     }
 
+    private bool TryGetWorkspaceNumber(Key key, out int workspaceIndex)
+{
+    workspaceIndex = key switch
+    {
+        Key.D0 or Key.NumPad0 => 0,
+        Key.D1 or Key.NumPad1 => 1,
+        Key.D2 or Key.NumPad2 => 2,
+        Key.D3 or Key.NumPad3 => 3,
+        Key.D4 or Key.NumPad4 => 4,
+        Key.D5 or Key.NumPad5 => 5,
+        Key.D6 or Key.NumPad6 => 6,
+        Key.D7 or Key.NumPad7 => 7,
+        Key.D8 or Key.NumPad8 => 8,
+        Key.D9 or Key.NumPad9 => 9,
+        _ => -1
+    };
+
+    return workspaceIndex >= 0;
+}
+
     // Bližnjice na tipkovnici.
     private async void OnKeyDown(object? sender,KeyEventArgs e){
         
@@ -691,6 +953,14 @@ private string GetCurrentPanelPath()
             return;
         }
 
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Alt) &&
+    TryGetWorkspaceNumber(e.Key, out int workspaceIndex))
+    {
+        SwitchWorkspace(workspaceIndex);
+        e.Handled = true;
+        return;
+    }
+
         bool altGrOrCtrlAlt =
         e.KeyModifiers.HasFlag(KeyModifiers.Control) &&
         e.KeyModifiers.HasFlag(KeyModifiers.Alt);
@@ -705,6 +975,21 @@ private string GetCurrentPanelPath()
             if (e.Key == Key.F4)
             {
                 Close();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.OemPlus ||e.Key == Key.Add)
+            {
+                SwitchWorkspace((_activeWorkspaceIndex + 1) % MaxWorkspaces);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.OemMinus ||e.Key == Key.Subtract)
+            {
+                SwitchWorkspace(
+                    (_activeWorkspaceIndex + MaxWorkspaces - 1) % MaxWorkspaces);
                 e.Handled = true;
                 return;
             }
@@ -758,6 +1043,11 @@ private string GetCurrentPanelPath()
                     e.Handled = true;
                     break;
 
+                case Key.R:
+                    await SetActivePaneDirectoryToHomeAsync();
+                    e.Handled = true;
+                    break;
+
                 case Key.Tab:
                     if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
                         PreviousPane();
@@ -781,6 +1071,50 @@ private string GetCurrentPanelPath()
         }
     }
 
+    private async Task SetActivePaneDirectoryToHomeAsync()
+    {
+        if (_panes.Count == 0)
+            return;
+
+        int index = Math.Clamp(_activePaneIndex, 0, _panes.Count - 1);
+        var pane = _panes[index];
+        string home = GetDefaultDirectory();
+
+        if (!Directory.Exists(home))
+            return;
+
+        // If the terminal has not started yet, its next PTY will use this CWD.
+        if (!pane.ShellStarted)
+        {
+            UpdatePaneDirectory(pane, home);
+            return;
+        }
+
+        // The resize handler may still be starting the PTY.
+        for (int attempt = 0; attempt < 40 && !pane.Adapter.IsAlive; attempt++)
+            await Task.Delay(25);
+
+        if (!pane.Adapter.IsAlive)
+            return;
+
+        string command = pane.ShellName switch
+        {
+            "Command Prompt" => $"cd /d \"{home}\"\r",
+            "Windows PowerShell" or "PowerShell 7" =>
+                $"Set-Location -LiteralPath {QuotePowerShell(home)}\r",
+            _ => $"cd -- {QuoteBash(home)}\n"
+        };
+
+        if (pane.Adapter.Send(System.Text.Encoding.UTF8.GetBytes(command)))
+            UpdatePaneDirectory(pane, home);
+    }
+
+    private static string QuotePowerShell(string path) =>
+        "'" + path.Replace("'", "''") + "'";
+
+    private static string QuoteBash(string path) =>
+        "'" + path.Replace("'", "'\\''") + "'";
+
     private void AdjustTerminalFontSize(int change)
     {
         if (_panes.Count == 0) return;
@@ -796,20 +1130,37 @@ private string GetCurrentPanelPath()
 
     // Ob zaprtju aplikacije zapri vse preostale PTY-povezave.
     private async void OnWindowClosed(object? sender, EventArgs e)
+{
+    if (_closing)
+        return;
+
+    _closing = true;
+
+    // Shrani poti vseh workspaceov.
+    for (int i = 0; i < MaxWorkspaces; i++)
     {
-        if (_closing) return;
+        SaveWorkspacePaths(i);
+    }
 
-        _closing = true;
+    _config.ActiveWorkspace = _activeWorkspaceIndex;
+    ConfigService.Save(_config);
 
-        foreach (var pane in _panes.ToArray())
+    // Zapri terminale v vseh workspaceih.
+    foreach (var workspace in _workspacePanes)
+    {
+        foreach (var pane in workspace.ToArray())
         {
             await pane.Adapter.DisposeAsync();
         }
 
-        _panes.Clear();
-        _themeWatcher?.Dispose();
-        _themeReloadTimer?.Stop();
+        workspace.Clear();
     }
+
+    _panes.Clear();
+
+    _themeWatcher?.Dispose();
+    _themeReloadTimer?.Stop();
+}
 
     private void OnShowShortcutsClicked( object? sender, RoutedEventArgs e)
     {
@@ -822,10 +1173,10 @@ private string GetCurrentPanelPath()
     {
         Title = "Keyboard shortcuts",
         SizeToContent = SizeToContent.Height,
-        Width = 460,
-        MinWidth = 460,
-        MinHeight = 200,
-        MaxHeight = 450,
+        Width = 400,
+        MinWidth = 400,
+        MinHeight = 600,
+        MaxHeight = 800,
         WindowStartupLocation = WindowStartupLocation.CenterOwner,
         Background = this.Background,
         Foreground = this.Foreground,
@@ -840,6 +1191,7 @@ private string GetCurrentPanelPath()
                 {
                     Text = "KEYBOARD SHORTCUTS",
                     FontSize = 20,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                     FontWeight = FontWeight.Bold,
                     Foreground = this.Foreground,
                     Margin = new Thickness(0, 0, 0, 8)
@@ -848,17 +1200,36 @@ private string GetCurrentPanelPath()
                 new TextBlock
                 {
                     Text =
+                        "══════════════════ TERMINAL ══════════════════\n\n"+
+                        "F1                         Show this help\n" +
                         "Alt + T                    Open theme list\n" +
                         "Alt + S                    Open shell list\n" +
                         "Alt + F                    Open font list\n" +
-                        "F1                         Show this help\n" +
-                        "Ctrl + T                   Split pane\n" +
-                        "Ctrl + W                   Close active pane\n" +
-                        "Ctrl + Tab                 Next pane\n" +
-                        "Ctrl + Shift + Tab         Previous pane\n" +
                         "Ctrl + +                   Increase font size\n" +
                         "Ctrl + -                   Decrease font size\n" +
-                        "Alt + F4                   Exit",
+                        "Ctrl + R                   Reset path to home\n" +
+                        "Alt + F4                   Exit \n\n" +
+                        "════════════════════ PANE ════════════════════\n\n"+
+                        "Ctrl + T                   Split pane\n" +
+                        "Ctrl + W                   Close active pane\n" +
+                        "Ctrl + R                   Go to home directory\n" +
+                        "Ctrl + Tab                 Next pane\n" +
+                        "Ctrl + Shift + Tab         Previous pane\n" +
+                        "\n" +
+                        "═════════════════ WORKSPACES ═════════════════\n\n"+
+                        "Alt + 0                    Move in workspace 0\n" +
+                        "Alt + 1                    Move in workspace 1\n" +
+                        "Alt + 2                    Move in workspace 2\n" +
+                        "Alt + 3                    Move in workspace 3\n" +
+                        "Alt + 4                    Move in workspace 4\n" +
+                        "Alt + 5                    Move in workspace 5\n" +
+                        "Alt + 6                    Move in workspace 6\n" +
+                        "Alt + 7                    Move in workspace 7\n" +
+                        "Alt + 8                    Move in workspace 8\n" +
+                        "Alt + 9                    Move in workspace 9\n" +
+                        "Alt + Plus                 Next workspace\n" +
+                        "Alt + Minus                Previous workspace\n",
+
                     FontFamily = new FontFamily("Consolas"),
                     FontSize = 14,
                     Foreground = this.Foreground
@@ -867,7 +1238,7 @@ private string GetCurrentPanelPath()
                 new Button
                 {
                     Content = "Close",
-                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                     Padding = new Thickness(20, 8),
                 }
             }

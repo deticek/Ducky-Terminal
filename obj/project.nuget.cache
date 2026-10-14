@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wvy/Pds5q/E=",
+  "dgSpecHash": "6iJCUJZ56XU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\deticek\\project\\terminal\\terminal\\terminal.csproj",
+  "projectFilePath": "C:\\Users\\deticek\\project\\terminal\\terminal.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\deticek\\.nuget\\packages\\avalonia\\12.1.1\\avalonia.12.1.1.nupkg.sha512",
     "C:\\Users\\deticek\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.27548.20260419\\avalonia.angle.windows.natives.2.1.27548.20260419.nupkg.sha512",

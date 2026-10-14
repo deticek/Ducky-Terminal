@@ -6,7 +6,7 @@
   "Appearance": {
     "Theme": "MyTheme",
     "FontFamily": "Consolas",
-    "FontSize": 14,
+    "FontSize": 17,
     "CursorStyle": "Block",
     "CursorBlink": true,
     "Padding": 8,
@@ -65,5 +65,78 @@
     "ClosePanel": "Ctrl\u002BW",
     "NextPanel": "Ctrl\u002BTab",
     "PreviousPanel": "Ctrl\u002BShift\u002BTab"
-  }
+  },
+  "Workspace": {
+    "Space0": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space1": {
+      "Panel1": "C:\\Users\\deticek\\project\\c#projects\\beeshell",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space2": {
+      "Panel1": "C:\\Users\\deticek\\project\\terminal",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space3": {
+      "Panel1": "C:\\Users",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space4": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space5": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space6": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space7": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space8": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    },
+    "Space9": {
+      "Panel1": "C:\\Users\\deticek",
+      "Panel2": "",
+      "Panel3": "",
+      "Panel4": "",
+      "Shell": "Command Prompt"
+    }
+  },
+  "ActiveWorkspace": 2
 }
