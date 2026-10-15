@@ -1,0 +1,34 @@
+{
+  "name": "Random1",
+  "author": "deticek",
+  "colors": {
+    "windowBackground": "#292727",
+    "panelBackground": "#1F1D1D",
+    "foreground": "#D8CFC4",
+    "cursor": "#E36A5B",
+    "selectionBackground": "#554B54",
+    "selectionForeground": "#E9DFD0",
+    "panelBorder": "#746666",
+    "toolbarBackground": "#353232",
+    "toolbarForeground": "#E9DFD0",
+    "accent": "#E36A5B"
+  },
+  "terminal": {
+    "black": "#292727",
+    "red": "#C45850",
+    "green": "#65AA88",
+    "yellow": "#D1B078",
+    "blue": "#5B93BC",
+    "magenta": "#C58F9D",
+    "cyan": "#45A39E",
+    "white": "#D8CFC4",
+    "brightBlack": "#746666",
+    "brightRed": "#EF7565",
+    "brightGreen": "#CED08B",
+    "brightYellow": "#E0C38A",
+    "brightBlue": "#91ABC4",
+    "brightMagenta": "#D5A6B2",
+    "brightCyan": "#81B4B0",
+    "brightWhite": "#E9DFD0"
+  }
+}

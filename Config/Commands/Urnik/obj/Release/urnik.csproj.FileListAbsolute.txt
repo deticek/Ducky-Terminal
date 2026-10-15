@@ -1,0 +1,17 @@
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.csproj.AssemblyReference.cache
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.AssemblyInfoInputs.cache
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.AssemblyInfo.cs
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.csproj.CoreCompileInputs.cache
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.sourcelink.json
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.csproj.Up2Date
+C:\Users\deticek\project\terminal\Config\Commands\urnik.exe
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.dll
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\refint\urnik.dll
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.pdb
+C:\Users\deticek\project\terminal\Config\Commands\urnik.deps.json
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\urnik.genruntimeconfig.cache
+C:\Users\deticek\project\terminal\Config\Commands\urnik.runtimeconfig.json
+C:\Users\deticek\project\terminal\Config\Commands\urnik.dll
+C:\Users\deticek\project\terminal\Config\Commands\Urnik\obj\Release\ref\urnik.dll
+C:\Users\deticek\project\terminal\Config\Commands\urnik.pdb

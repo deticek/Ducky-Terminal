@@ -181,6 +181,14 @@ public static string ConfigDirectory
 {
     get
     {
+        string applicationDirectory = AppContext.BaseDirectory;
+        string publishedConfigDirectory = Path.Combine(applicationDirectory, "Config");
+        if (File.Exists(Path.Combine(applicationDirectory, ".ducky-published")) &&
+            Directory.Exists(publishedConfigDirectory))
+        {
+            return publishedConfigDirectory;
+        }
+
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
 
         while (directory is not null)

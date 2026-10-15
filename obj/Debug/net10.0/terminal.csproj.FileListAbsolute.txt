@@ -120,10 +120,6 @@ C:\Users\deticek\project\terminal\bin\Debug\net10.0\Themes\MyTheme.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Themes\NkMaribor.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Themes\Random.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Themes\WindowsXP.json
-C:\Users\deticek\project\terminal\bin\Debug\net10.0\terminal.deps.json
-C:\Users\deticek\project\terminal\bin\Debug\net10.0\terminal.runtimeconfig.json
-C:\Users\deticek\project\terminal\bin\Debug\net10.0\terminal.dll
-C:\Users\deticek\project\terminal\bin\Debug\net10.0\terminal.pdb
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Avalonia.Base.dll
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Avalonia.Controls.dll
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\Avalonia.DesignerSupport.dll
@@ -220,11 +216,7 @@ C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.AssemblyInfo.cs
 C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.csproj.CoreCompileInputs.cache
 C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.sourcelink.json
 C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.csproj.Up2Date
-C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.dll
-C:\Users\deticek\project\terminal\obj\Debug\net10.0\refint\terminal.dll
-C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.pdb
 C:\Users\deticek\project\terminal\obj\Debug\net10.0\terminal.genruntimeconfig.cache
-C:\Users\deticek\project\terminal\obj\Debug\net10.0\ref\terminal.dll
 C:\Users\deticek\.codex\visualizations\2026\10\14\01a13bb2-b81a-7822-8d9d-8120d53b75e3\build-check\Config\config.json
 C:\Users\deticek\.codex\visualizations\2026\10\14\01a13bb2-b81a-7822-8d9d-8120d53b75e3\build-check\Themes\Cendre.json
 C:\Users\deticek\.codex\visualizations\2026\10\14\01a13bb2-b81a-7822-8d9d-8120d53b75e3\build-check\Themes\Ducky.json
@@ -336,7 +328,6 @@ C:\Users\deticek\project\terminal\build-check\runtimes\win-x64\native\libSkiaSha
 C:\Users\deticek\project\terminal\build-check\runtimes\win-x86\native\libSkiaSharp.dll
 C:\Users\deticek\project\terminal\build-check\runtimes\win-x86\native\libSkiaSharp.pdb
 C:\Users\deticek\project\terminal\build-check\runtimes\win\lib\net9.0\System.Management.dll
-C:\Users\deticek\project\terminal\bin\Debug\net10.0\terminal.exe
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\hello.deps.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\hello.runtimeconfig.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\hello.exe
@@ -348,3 +339,12 @@ C:\Users\deticek\project\terminal\bin\Debug\net10.0\password.pdb
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\urnik.deps.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\urnik.runtimeconfig.json
 C:\Users\deticek\project\terminal\bin\Debug\net10.0\urnik.exe
+C:\Users\deticek\project\terminal\bin\Debug\net10.0\Ducky.exe
+C:\Users\deticek\project\terminal\bin\Debug\net10.0\Ducky.deps.json
+C:\Users\deticek\project\terminal\bin\Debug\net10.0\Ducky.runtimeconfig.json
+C:\Users\deticek\project\terminal\bin\Debug\net10.0\Ducky.dll
+C:\Users\deticek\project\terminal\bin\Debug\net10.0\Ducky.pdb
+C:\Users\deticek\project\terminal\obj\Debug\net10.0\Ducky.dll
+C:\Users\deticek\project\terminal\obj\Debug\net10.0\refint\Ducky.dll
+C:\Users\deticek\project\terminal\obj\Debug\net10.0\Ducky.pdb
+C:\Users\deticek\project\terminal\obj\Debug\net10.0\ref\Ducky.dll

@@ -1,0 +1,34 @@
+{
+  "name": "Cendre",
+  "author": "deticek",
+  "colors": {
+    "windowBackground": "#292C32",
+    "panelBackground": "#1C1F24",
+    "foreground": "#D8DEE9",
+    "cursor": "#EBCB8B",
+    "selectionBackground": "#4C566A",
+    "selectionForeground": "#ECEFF4",
+    "panelBorder": "#5E6878",
+    "toolbarBackground": "#343840",
+    "toolbarForeground": "#ECEFF4",
+    "accent": "#88C0D0"
+  },
+  "terminal": {
+    "black": "#2E3440",
+    "red": "#BF616A",
+    "green": "#A3BE8C",
+    "yellow": "#EBCB8B",
+    "blue": "#81A1C1",
+    "magenta": "#B48EAD",
+    "cyan": "#88C0D0",
+    "white": "#D8DEE9",
+    "brightBlack": "#4C566A",
+    "brightRed": "#D08770",
+    "brightGreen": "#B5CEA8",
+    "brightYellow": "#F0D399",
+    "brightBlue": "#8FBCBB",
+    "brightMagenta": "#C895BF",
+    "brightCyan": "#9CD9D7",
+    "brightWhite": "#ECEFF4"
+  }
+}

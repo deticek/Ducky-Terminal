@@ -1,0 +1,34 @@
+{
+  "name": "MarbleDark",
+  "author": "nvimbtw",
+  "colors": {
+    "windowBackground": "#12120F",
+    "panelBackground": "#181616",
+    "foreground": "#C5C9C5",
+    "cursor": "#C4B28A",
+    "selectionBackground": "#223249",
+    "selectionForeground": "#C5C9C5",
+    "panelBorder": "#514D4C",
+    "toolbarBackground": "#232221",
+    "toolbarForeground": "#C5C9C5",
+    "accent": "#7AB2A4"
+  },
+  "terminal": {
+    "black": "#181616",
+    "red": "#C4746E",
+    "green": "#87A987",
+    "yellow": "#C4B28A",
+    "blue": "#8EA1B5",
+    "magenta": "#C5819B",
+    "cyan": "#7AB2A4",
+    "white": "#A6A69C",
+    "brightBlack": "#8C8480",
+    "brightRed": "#D97145",
+    "brightGreen": "#9AC59A",
+    "brightYellow": "#F1A355",
+    "brightBlue": "#6D92DA",
+    "brightMagenta": "#A9A2C5",
+    "brightCyan": "#79CBB8",
+    "brightWhite": "#C5C9C5"
+  }
+}

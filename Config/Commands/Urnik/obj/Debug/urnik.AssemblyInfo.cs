@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("urnik")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63166d8b9067c1659e7e35dfe6871da9e9289519")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b0370db34fffba1bc78e0d166e30695ddd4a526a")]
 [assembly: System.Reflection.AssemblyProductAttribute("urnik")]
 [assembly: System.Reflection.AssemblyTitleAttribute("urnik")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
