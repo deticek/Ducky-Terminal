@@ -68,7 +68,11 @@ private const int MaxWorkspaces = 10;
     private readonly AppConfig _config;
     private ThemeFile _theme;
 
-    public MainWindow(){
+    public MainWindow() : this(null)
+    {
+    }
+
+    public MainWindow(string? initialDirectory){
         
         InitializeComponent();
 
@@ -135,6 +139,16 @@ private const int MaxWorkspaces = 10;
         //AddPane();
 
         LoadWorkspacePanes(_activeWorkspaceIndex);
+
+        if (!string.IsNullOrWhiteSpace(initialDirectory) &&
+            Directory.Exists(initialDirectory) &&
+            _panes.Count > 0)
+        {
+            UpdatePaneDirectory(
+                _panes[_activePaneIndex],
+                Path.GetFullPath(initialDirectory));
+        }
+
         RebuildLayout();
 
         Title=$"Ducky - Workspace{_activeWorkspaceIndex}";
