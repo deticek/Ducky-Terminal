@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -12,9 +13,11 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 
 using Exclr8.Terminal;
+using Exclr8.Terminal.Buffer;
 using Exclr8.Terminal.Pty;
 using Exclr8.Terminal.Render;
 using Porta.Pty;
+using terminal.Commands;
 
 namespace terminal;
 
@@ -27,6 +30,9 @@ public partial class MainWindow : Window
         public bool ShellStarted { get; set; }
         public string CurrentDirectory { get; set; }
         public string ShellName { get; }
+        public StringBuilder CommandLine { get; } = new();
+        public int CommandCursor { get; set; }
+        public bool CommandLineTrackingReliable { get; set; } = true;
 
         public TerminalPane(
             TerminalControl terminal,
@@ -58,12 +64,16 @@ private const int MaxWorkspaces = 10;
 
     private bool _closing;
     private bool _shellRestarting;
+    private bool _startupAuthenticated;
     private readonly AppConfig _config;
     private ThemeFile _theme;
 
     public MainWindow(){
         
         InitializeComponent();
+
+        _startupAuthenticated = !Password.HasPassword();
+        TerminalHost.IsVisible = _startupAuthenticated;
 
         _config = ConfigService.Load();
 
@@ -134,7 +144,29 @@ private const int MaxWorkspaces = 10;
 
         Closed += OnWindowClosed;
 
-        Opened += (_, _) => {
+        Opened += async (_, _) => {
+            if (!_startupAuthenticated)
+            {
+                bool authenticated = false;
+                bool previousAttemptFailed = false;
+                while (!authenticated)
+                {
+                    string? enteredPassword = await RequestStartupPassword(previousAttemptFailed);
+                    if (enteredPassword is null)
+                    {
+                        Close();
+                        return;
+                    }
+
+                    authenticated = Password.CheckPassword(enteredPassword);
+                    previousAttemptFailed = !authenticated;
+                }
+
+                _startupAuthenticated = true;
+                TerminalHost.IsVisible = true;
+                RebuildLayout();
+            }
+
             if (_panes.Count > 0)
                 _panes[_activePaneIndex].Terminal.Focus();
         };
@@ -643,8 +675,29 @@ private void QueueThemeReload()
         {
             FontFamily = _config.Appearance.FontFamily,
             FontSize = _config.Appearance.FontSize,
+            ShowHyperlinkUnderline = false,
             ScrollbackLimit = 10000,
             ColorScheme = CreateTerminalTheme()
+        };
+
+        // Exclr8.Terminal renders ANSI underlines as horizontal strokes along
+        // cell bottoms. In this app they appear as a distracting grid in
+        // full-screen TUIs, so suppress SGR underlines in the visible buffer.
+        terminal.Buffer.Changed += (_, _) =>
+        {
+            for (int rowIndex = 0; rowIndex < terminal.Buffer.Rows; rowIndex++)
+            {
+                TerminalCell[] row = terminal.Buffer.GetVisibleRow(rowIndex);
+                for (int columnIndex = 0; columnIndex < row.Length; columnIndex++)
+                {
+                    TerminalCell cell = row[columnIndex];
+                    if ((cell.Flags & CellFlags.Underline) == 0)
+                        continue;
+
+                    cell.Flags &= ~CellFlags.Underline;
+                    row[columnIndex] = cell;
+                }
+            }
         };
 
         var selectedShell = _shellChoices.First(choice => choice.Name == _config.Shell.Selected);
@@ -655,6 +708,8 @@ private void QueueThemeReload()
             adapter,
             workingDirectory,
             selectedShell.Name);
+
+        terminal.Input += (_, input) => TrackCommandLineInput(pane, input.Span);
 
     terminal.WorkingDirectoryChanged += (_, _) =>
 {
@@ -714,7 +769,8 @@ private void QueueThemeReload()
 
         terminal.Resized += async (_, size) =>
         {
-            if (pane.ShellStarted ||
+            if (!_startupAuthenticated ||
+                pane.ShellStarted ||
                 size.Cols <= 0 ||
                 size.Rows <= 0)
             {
@@ -750,11 +806,30 @@ private void QueueThemeReload()
                     ["COLORTERM"] = "truecolor"
                 };
 
+                string customCommandDirectory = Path.Combine(
+                    ConfigService.ConfigDirectory,
+                    "Commands");
+                Directory.CreateDirectory(customCommandDirectory);
+
+                string existingPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                shellEnvironment["PATH"] = string.IsNullOrWhiteSpace(existingPath)
+                    ? customCommandDirectory
+                    : customCommandDirectory + Path.PathSeparator + existingPath;
+
                 if (selectedShell.Name == "Command Prompt")
                 {
-                    // CMD reads PROMPT from its environment at startup. This
-                    // emits OSC 7 before each visible, otherwise standard prompt.
-                    shellEnvironment["PROMPT"] = @"$E]7;file:///$P$E\$P$G";
+                    // The visible CMD prompt is configurable; OSC 7 remains
+                    // attached so current-directory tracking keeps working.
+                    string promptFormat = string.IsNullOrWhiteSpace(_config.Shell.Prompt)
+                        ? new ShellSelectionConfig().Prompt
+                        : _config.Shell.Prompt;
+
+                    string visiblePrompt = promptFormat
+                        .Replace("{username}", Environment.UserName, StringComparison.OrdinalIgnoreCase)
+                        .Replace("{computer}", Environment.MachineName, StringComparison.OrdinalIgnoreCase);
+
+                    shellEnvironment["PROMPT"] =
+                        @"$E]7;file:///$P$E\" + visiblePrompt;
                 }
 
                 await adapter.StartAsync(new PtyOptions
@@ -1031,6 +1106,26 @@ private string GetCurrentPanelPath()
 
         if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
         {
+            if (e.Key == Key.Back)
+            {
+                if (_panes.Count > 0)
+                {
+                    int index = Math.Clamp(_activePaneIndex, 0, _panes.Count - 1);
+                    var pane = _panes[index];
+
+                    if (pane.ShellStarted && pane.Adapter.IsAlive)
+                    {
+                        if (pane.ShellName == "Command Prompt")
+                            DeletePreviousCommandWord(pane);
+                        else
+                            pane.Adapter.Send(System.Text.Encoding.UTF8.GetBytes("\x17"));
+                    }
+                }
+
+                e.Handled = true;
+                return;
+            }
+
             switch (e.Key)
             {
                 case Key.T:
@@ -1068,6 +1163,110 @@ private string GetCurrentPanelPath()
                     e.Handled = true;
                     break;
             }
+        }
+    }
+
+    private static void TrackCommandLineInput(TerminalPane pane, ReadOnlySpan<byte> input)
+    {
+        if (pane.ShellName != "Command Prompt")
+            return;
+
+        string text = Encoding.UTF8.GetString(input);
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+
+            if (c is '\r' or '\n')
+            {
+                pane.CommandLine.Clear();
+                pane.CommandCursor = 0;
+                pane.CommandLineTrackingReliable = true;
+                continue;
+            }
+
+            if (c is '\b' or '\x7f')
+            {
+                if (pane.CommandCursor > 0)
+                {
+                    pane.CommandLine.Remove(--pane.CommandCursor, 1);
+                }
+                continue;
+            }
+
+            if (c == '\x1b')
+            {
+                string[] leftSequences = ["\x1b[D", "\x1b[1D", "\x1b[H", "\x1b[1~"];
+                string[] rightSequences = ["\x1b[C", "\x1b[1C", "\x1b[F", "\x1b[4~"];
+                string[] deleteSequences = ["\x1b[3~"];
+                string? sequence = new[] { leftSequences, rightSequences, deleteSequences }
+                    .SelectMany(group => group)
+                    .Where(candidate => text.AsSpan(i).StartsWith(candidate, StringComparison.Ordinal))
+                    .OrderByDescending(candidate => candidate.Length)
+                    .FirstOrDefault();
+
+                if (sequence is null)
+                {
+                    pane.CommandLineTrackingReliable = false;
+                    continue;
+                }
+
+                if (leftSequences.Contains(sequence, StringComparer.Ordinal))
+                    pane.CommandCursor = Math.Max(0, pane.CommandCursor - 1);
+                else if (rightSequences.Contains(sequence, StringComparer.Ordinal))
+                    pane.CommandCursor = Math.Min(pane.CommandLine.Length, pane.CommandCursor + 1);
+                else if (pane.CommandCursor < pane.CommandLine.Length)
+                    pane.CommandLine.Remove(pane.CommandCursor, 1);
+
+                i += sequence.Length - 1;
+                continue;
+            }
+
+            if (char.IsControl(c))
+            {
+                switch (c)
+                {
+                    case '\x01': // Ctrl+A
+                        pane.CommandCursor = 0;
+                        break;
+                    case '\x05': // Ctrl+E
+                        pane.CommandCursor = pane.CommandLine.Length;
+                        break;
+                    case '\x03': // Ctrl+C
+                    case '\x15': // Ctrl+U
+                        pane.CommandLine.Clear();
+                        pane.CommandCursor = 0;
+                        break;
+                    default:
+                        pane.CommandLineTrackingReliable = false;
+                        break;
+                }
+                continue;
+            }
+
+            pane.CommandLine.Insert(pane.CommandCursor++, c);
+        }
+    }
+
+    private static void DeletePreviousCommandWord(TerminalPane pane)
+    {
+        if (!pane.CommandLineTrackingReliable || pane.CommandCursor == 0)
+            return;
+
+        int start = pane.CommandCursor;
+        while (start > 0 && char.IsWhiteSpace(pane.CommandLine[start - 1]))
+            start--;
+        while (start > 0 && !char.IsWhiteSpace(pane.CommandLine[start - 1]))
+            start--;
+
+        int count = pane.CommandCursor - start;
+        if (count == 0)
+            return;
+
+        byte[] backspaces = Enumerable.Repeat((byte)0x7f, count).ToArray();
+        if (pane.Adapter.Send(backspaces))
+        {
+            pane.CommandLine.Remove(start, count);
+            pane.CommandCursor = start;
         }
     }
 
@@ -1165,6 +1364,71 @@ private string GetCurrentPanelPath()
     private void OnShowShortcutsClicked( object? sender, RoutedEventArgs e)
     {
         ShowShortcutsHelp();
+    }
+
+    private async Task<string?> RequestStartupPassword(bool previousAttemptFailed)
+    {
+        var statusText = new TextBlock
+        {
+            Text = previousAttemptFailed
+                ? "Incorrect password. Try again."
+                : "Enter your password to continue.",
+            Foreground = previousAttemptFailed ? Brushes.IndianRed : Foreground
+        };
+        var passwordBox = new TextBox
+        {
+            PasswordChar = '●',
+            PlaceholderText = "Password",
+            MinWidth = 260,
+            Margin = new Thickness(0, 10, 0, 14)
+        };
+
+        var dialog = new Window
+        {
+            Title = "Ducky password",
+            Width = 360,
+            SizeToContent = SizeToContent.Height,
+            CanResize = false,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Background = Background,
+            Foreground = Foreground,
+            Content = new StackPanel
+            {
+                Margin = new Thickness(20),
+                Spacing = 8,
+                Children =
+                {
+                    statusText,
+                    passwordBox,
+                    new StackPanel
+                    {
+                        Orientation = Avalonia.Layout.Orientation.Horizontal,
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                        Spacing = 8,
+                        Children =
+                        {
+                            new Button { Content = "Cancel", MinWidth = 80, Name = "CancelPasswordButton" },
+                            new Button { Content = "Unlock", MinWidth = 80, Name = "UnlockPasswordButton" }
+                        }
+                    }
+                }
+            }
+        };
+
+        var buttons = (StackPanel)((StackPanel)dialog.Content!).Children[2];
+        ((Button)buttons.Children[0]).Click += (_, _) => dialog.Close(null);
+        ((Button)buttons.Children[1]).Click += (_, _) => dialog.Close(passwordBox.Text ?? string.Empty);
+        passwordBox.KeyDown += (_, e) =>
+        {
+            if (e.Key == Key.Enter)
+            {
+                dialog.Close(passwordBox.Text ?? string.Empty);
+                e.Handled = true;
+            }
+        };
+        dialog.Opened += (_, _) => passwordBox.Focus();
+
+        return await dialog.ShowDialog<string?>(this);
     }
 
     private void ShowShortcutsHelp()

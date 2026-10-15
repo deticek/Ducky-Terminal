@@ -97,6 +97,7 @@ public string PreviousPanel { get; set; } = "Ctrl+Shift+Tab";
 public sealed class ShellSelectionConfig
 {
     public string Selected { get; set; } = "Command Prompt";
+    public string Prompt { get; set; } = "$E[32m{username}@{computer} $P$G $E[0m";
 }
 
 public sealed class WorkspaceConfig
@@ -176,8 +177,28 @@ WriteIndented = true
 };
 
 
-public static string ConfigDirectory =>
-    Path.Combine(Environment.CurrentDirectory, "Config");
+public static string ConfigDirectory
+{
+    get
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            string configDirectory = Path.Combine(directory.FullName, "Config");
+
+            if (File.Exists(Path.Combine(directory.FullName, "terminal.csproj")) &&
+                Directory.Exists(configDirectory))
+            {
+                return configDirectory;
+            }
+
+            directory = directory.Parent;
+        }
+
+        return Path.Combine(AppContext.BaseDirectory, "Config");
+    }
+}
 
 public static string ConfigPath =>
     Path.Combine(ConfigDirectory, "config.json");

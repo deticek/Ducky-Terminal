@@ -20,8 +20,11 @@
     <PackageReference Include="Exclr8.Terminal.Pty" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup> 
+  <Compile Remove="Config\Commands\**\*.cs" />
+  <ProjectReference Include="Config\Commands\Hello\hello.csproj" ReferenceOutputAssembly="false" />
+  <ProjectReference Include="Config\Commands\Password\password.csproj" />
+  <ProjectReference Include="Config\Commands\Urnik\urnik.csproj" ReferenceOutputAssembly="false" />
   <None Update="Config\config.json" CopyToOutputDirectory="PreserveNewest" />
-
   <None Update="Themes\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 
   <AvaloniaResource Include="Assets\logo.ico" />

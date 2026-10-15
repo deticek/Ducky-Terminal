@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "Xhw/sr2PoA8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\deticek\\project\\terminal\\Config\\Commands\\Urnik\\urnik.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\deticek\\.nuget\\packages\\htmlagilitypack\\1.13.1\\htmlagilitypack.1.13.1.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -833,6 +833,16 @@
             "related": ".xml"
           }
         }
+      },
+      "password/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/password.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/password.dll": {}
+        }
       }
     }
   },
@@ -1968,6 +1978,11 @@
         "vanara.pinvoke.shared.4.2.1.nupkg.sha512",
         "vanara.pinvoke.shared.nuspec"
       ]
+    },
+    "password/1.0.0": {
+      "type": "project",
+      "path": "Config/Commands/Password/password.csproj",
+      "msbuildProject": "Config/Commands/Password/password.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -1978,7 +1993,8 @@
       "Avalonia.Themes.Fluent >= 12.1.1",
       "AvaloniaUI.DiagnosticsSupport >= 2.2.3",
       "Exclr8.Terminal >= 1.0.9",
-      "Exclr8.Terminal.Pty >= 1.0.4"
+      "Exclr8.Terminal.Pty >= 1.0.4",
+      "password >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2014,7 +2030,11 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\deticek\\project\\terminal\\Config\\Commands\\Password\\password.csproj": {
+              "projectPath": "C:\\Users\\deticek\\project\\terminal\\Config\\Commands\\Password\\password.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

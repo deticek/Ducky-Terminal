@@ -1,0 +1,1 @@
+Urnik.GetUrnik();

@@ -14,7 +14,8 @@
           "Avalonia.Themes.Fluent": "12.1.1",
           "AvaloniaUI.DiagnosticsSupport": "2.2.3",
           "Exclr8.Terminal": "1.0.9",
-          "Exclr8.Terminal.Pty": "1.0.4"
+          "Exclr8.Terminal.Pty": "1.0.4",
+          "password": "1.0.0"
         },
         "runtime": {
           "terminal.dll": {}
@@ -649,6 +650,14 @@
             "fileVersion": "4.2.1.0"
           }
         }
+      },
+      "password/1.0.0": {
+        "runtime": {
+          "password.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -902,6 +911,11 @@
       "sha512": "sha512-EVLvS02V6mL3xWo4cMv0OCo5H3uVR0eWxb0TtfcoI/SVaCKYWi1F000nax+uuEBJGmS90cfpYDvsgPn408b2ag==",
       "path": "vanara.pinvoke.shared/4.2.1",
       "hashPath": "vanara.pinvoke.shared.4.2.1.nupkg.sha512"
+    },
+    "password/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
