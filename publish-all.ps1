@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $projectFile = Join-Path $PSScriptRoot 'terminal.csproj'
-$finishDirectory = Join-Path (Split-Path $PSScriptRoot -Parent) 'finish'
+$releaseDirectory = Join-Path $PSScriptRoot 'relese'
 
 $runtimes = @(
     @{ Id = 'win-x64'; Folder = 'win-x64' },
@@ -13,12 +13,12 @@ $runtimes = @(
 )
 
 foreach ($runtime in $runtimes) {
-    if ($runtime.Id -eq 'win-x64') {
-        $outputDirectory = Join-Path $finishDirectory 'ducky'
+    $outputDirectory = Join-Path $releaseDirectory $runtime.Folder
+
+    if (Test-Path -LiteralPath $outputDirectory) {
+        Remove-Item -LiteralPath $outputDirectory -Recurse -Force
     }
-    else {
-        $outputDirectory = Join-Path $finishDirectory "$($runtime.Folder)\ducky"
-    }
+    New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 
     Write-Host "Publishing Ducky without private commands for $($runtime.Id) to $outputDirectory"
 
@@ -66,4 +66,4 @@ foreach ($runtime in $runtimes) {
     }
 }
 
-Write-Host "All Ducky variants were published under $finishDirectory"
+Write-Host "All Ducky variants were published under $releaseDirectory"

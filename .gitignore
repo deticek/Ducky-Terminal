@@ -8,6 +8,7 @@ obj/
 artifacts/
 publish/
 finish/
+/relese/
 
 # Private local command, never included in the public repository
 /Config/Commands/Urnik/
