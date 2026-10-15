@@ -48,7 +48,7 @@ On Windows, start `Ducky.exe` from the folder for your architecture. On Linux or
 
 ## Configuration
 
-In a published build, edit `Config/config.json` to customize Ducky. Theme files are in the `Themes` folder. Keep the application folder writable so Ducky can save its settings.
+In a published build, Ducky stores its settings in your user profile so it can save them regardless of where the application is installed. On Windows, the file is `%LOCALAPPDATA%\Ducky\Config\config.json`. The shipped themes and custom command programs remain in the application folder (`Themes` and `Config/Commands`). When running from source, settings are read from `Config/config.json` in the project.
 
 ## Keyboard shortcuts
 

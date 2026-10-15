@@ -177,16 +177,20 @@ WriteIndented = true
 };
 
 
+private static bool IsPublishedBuild =>
+    File.Exists(Path.Combine(AppContext.BaseDirectory, ".ducky-published")) &&
+    Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Config"));
+
 public static string ConfigDirectory
 {
     get
     {
-        string applicationDirectory = AppContext.BaseDirectory;
-        string publishedConfigDirectory = Path.Combine(applicationDirectory, "Config");
-        if (File.Exists(Path.Combine(applicationDirectory, ".ducky-published")) &&
-            Directory.Exists(publishedConfigDirectory))
+        if (IsPublishedBuild)
         {
-            return publishedConfigDirectory;
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Ducky",
+                "Config");
         }
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
@@ -211,15 +215,32 @@ public static string ConfigDirectory
 public static string ConfigPath =>
     Path.Combine(ConfigDirectory, "config.json");
 
+public static string CommandsDirectory => IsPublishedBuild
+    ? Path.Combine(AppContext.BaseDirectory, "Config", "Commands")
+    : Path.Combine(ConfigDirectory, "Commands");
+
 public static AppConfig Load()
 {
     try
     {
         if (!File.Exists(ConfigPath))
         {
-            var defaultConfig = new AppConfig();
-            Save(defaultConfig);
-            return defaultConfig;
+            string packagedConfigPath = Path.Combine(
+                AppContext.BaseDirectory,
+                "Config",
+                "config.json");
+
+            if (IsPublishedBuild && File.Exists(packagedConfigPath))
+            {
+                Directory.CreateDirectory(ConfigDirectory);
+                File.Copy(packagedConfigPath, ConfigPath);
+            }
+            else
+            {
+                var defaultConfig = new AppConfig();
+                Save(defaultConfig);
+                return defaultConfig;
+            }
         }
 
         string json = File.ReadAllText(ConfigPath);

@@ -806,9 +806,7 @@ private void QueueThemeReload()
                     ["COLORTERM"] = "truecolor"
                 };
 
-                string customCommandDirectory = Path.Combine(
-                    ConfigService.ConfigDirectory,
-                    "Commands");
+                string customCommandDirectory = ConfigService.CommandsDirectory;
                 Directory.CreateDirectory(customCommandDirectory);
 
                 string existingPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
