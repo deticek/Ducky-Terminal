@@ -1,0 +1,30 @@
+# .NET build output
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Published installers and portable builds
+artifacts/
+publish/
+finish/
+
+# Private local command, never included in the public repository
+/Config/Commands/Urnik/
+/Config/Commands/urnik.*
+
+# Generated custom-command binaries and NuGet dependency
+/Config/Commands/*.dll
+/Config/Commands/*.exe
+/Config/Commands/*.pdb
+/Config/Commands/*.deps.json
+/Config/Commands/*.runtimeconfig.json
+/Config/Commands/HtmlAgilityPack.dll
+/Config/Commands/*-x64/
+/Config/Commands/*-arm64/
+
+# IDE and local settings
+.vs/
+.vscode/
+*.user
+*.suo

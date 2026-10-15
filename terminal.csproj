@@ -5,7 +5,6 @@
     <Product>Ducky</Product>
     <Title>Ducky</Title>
     <TargetFramework>net10.0</TargetFramework>
-    <IncludeUrnik Condition="'$(IncludeUrnik)' == ''">true</IncludeUrnik>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
@@ -27,21 +26,15 @@
   <Compile Remove="Config\Commands\**\*.cs" />
   <ProjectReference Include="Config\Commands\Hello\hello.csproj" ReferenceOutputAssembly="false" />
   <ProjectReference Include="Config\Commands\Password\password.csproj" />
-  <ProjectReference Include="Config\Commands\Urnik\urnik.csproj" ReferenceOutputAssembly="false" Condition="'$(IncludeUrnik)' == 'true'" />
   <None Update="Config\config.json" CopyToOutputDirectory="PreserveNewest" />
   <None Update="Themes\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 
   <AvaloniaResource Include="Assets\logo.ico" />
   </ItemGroup>
 
-  <Target Name="CopyCustomCommandsToPublish" AfterTargets="Publish">
+  <Target Name="PrepareCustomCommandsForPublish" AfterTargets="Publish">
+    <RemoveDir Directories="$(PublishDir)Config\Commands" />
     <MakeDir Directories="$(PublishDir)Config\Commands" />
     <WriteLinesToFile File="$(PublishDir).ducky-published" Lines="Ducky publish output" Overwrite="true" />
-    <ItemGroup>
-      <_PublishedCommand Include="$(MSBuildProjectDirectory)\Config\Commands\hello.exe;$(MSBuildProjectDirectory)\Config\Commands\hello.dll;$(MSBuildProjectDirectory)\Config\Commands\hello.deps.json;$(MSBuildProjectDirectory)\Config\Commands\hello.runtimeconfig.json" />
-      <_PublishedCommand Include="$(MSBuildProjectDirectory)\Config\Commands\password.exe;$(MSBuildProjectDirectory)\Config\Commands\password.dll;$(MSBuildProjectDirectory)\Config\Commands\password.deps.json;$(MSBuildProjectDirectory)\Config\Commands\password.runtimeconfig.json" />
-      <_PublishedCommand Include="$(MSBuildProjectDirectory)\Config\Commands\urnik.exe;$(MSBuildProjectDirectory)\Config\Commands\urnik.dll;$(MSBuildProjectDirectory)\Config\Commands\urnik.deps.json;$(MSBuildProjectDirectory)\Config\Commands\urnik.runtimeconfig.json;$(MSBuildProjectDirectory)\Config\Commands\HtmlAgilityPack.dll" Condition="'$(IncludeUrnik)' == 'true'" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_PublishedCommand)" DestinationFolder="$(PublishDir)Config\Commands" SkipUnchangedFiles="true" />
   </Target>
 </Project>

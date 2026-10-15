@@ -5,7 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>hello</AssemblyName>
-    <OutputPath>$(MSBuildThisFileDirectory)..\</OutputPath>
+    <OutputPath Condition="'$(RuntimeIdentifier)' == ''">$(MSBuildThisFileDirectory)..\</OutputPath>
+    <OutputPath Condition="'$(RuntimeIdentifier)' != ''">$(MSBuildThisFileDirectory)..\$(RuntimeIdentifier)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>

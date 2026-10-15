@@ -14,6 +14,12 @@ public static class Password
                 if (File.Exists(Path.Combine(directory.FullName, "config.json")))
                     return Path.Combine(directory.FullName, "password.dat");
 
+                if (File.Exists(Path.Combine(directory.FullName, ".ducky-published")) &&
+                    Directory.Exists(Path.Combine(directory.FullName, "Config")))
+                {
+                    return Path.Combine(directory.FullName, "Config", "password.dat");
+                }
+
                 if (File.Exists(Path.Combine(directory.FullName, "terminal.csproj")) &&
                     Directory.Exists(Path.Combine(directory.FullName, "Config")))
                 {
